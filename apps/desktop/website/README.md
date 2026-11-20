@@ -10,7 +10,24 @@ website/
     PC-Doctor-Portable-1.0.0.exe
 ```
 
-## Publish it
+## Live site
+
+**https://pc-doctor-three.vercel.app** (Vercel project `pc-doctor`)
+
+The download buttons link to the installers stored in this GitHub repository with Git LFS, so Vercel only hosts the small page. The `.vercelignore` file keeps the large `downloads/` folder out of the upload.
+
+### Deploy a change to Vercel
+
+Run these from this `website` folder:
+
+```
+npx vercel login          # once, approve the link in your browser
+npx vercel deploy --prod  # publishes to the live address
+```
+
+Pushing to GitHub does **not** deploy automatically (Git deployments are switched off for this project). Always deploy with the command above.
+
+## Publish it somewhere else
 
 Upload the whole `website` folder to any static host (Vercel, Netlify, GitHub Pages, IIS, or a plain web server). The download buttons point at `downloads/...` next to the page.
 
