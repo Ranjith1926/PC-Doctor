@@ -8,5 +8,3 @@ dist/
 # Packaged installers (built with npm run dist)
 Output file/
 
-# Large installers copied next to the download page
-website/downloads/

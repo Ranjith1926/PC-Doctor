@@ -4,8 +4,6 @@ out/
 dist/
 Output file/
 
-# Large installers copied next to the download page
-apps/desktop/website/downloads/
 
 # Never commit signing keys or license keys
 *.pem
