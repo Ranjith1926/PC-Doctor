@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Download PC Doctor</title>
+  <meta name="description" content="PC Doctor is a free Windows app that checks your PC's health, shows what you can safely clean and manages startup apps. Everything stays on your PC." />
+  <meta name="theme-color" content="#080d1c" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234d8dff'/%3E%3Cpath d='M9 8v7a7 7 0 0 0 14 0V8' fill='none' stroke='%2306112b' stroke-width='2.6' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='24' r='2.4' fill='%2306112b'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --bg: #080d1c; --raised: #0e1630; --glass: rgba(21, 31, 60, 0.6); --glass-strong: rgba(26, 38, 72, 0.85);
+      --line: rgba(160, 185, 255, 0.16); --line-strong: rgba(160, 185, 255, 0.3);
+      --fg: #eaf0ff; --muted: #a3b3d6; --subtle: #8393b9;
+      --primary: #4d8dff; --primary-fg: #06112b; --accent: #22d3ee; --success: #34d399; --warning: #fbbf24;
+      --ring: #8bb8ff; --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--fg); background-color: var(--bg);
+      background-image:
+        radial-gradient(900px 600px at 12% -8%, rgba(77, 141, 255, 0.24), transparent 60%),
+        radial-gradient(700px 520px at 100% 6%, rgba(34, 211, 238, 0.14), transparent 60%),
+        radial-gradient(820px 560px at 55% 118%, rgba(124, 58, 237, 0.14), transparent 60%);
+      background-attachment: fixed;
+      font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+    :focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; border-radius: 8px; }
+    .wrap { width: min(1120px, 100% - 40px); margin-inline: auto; }
+    .glass {
+      background: var(--glass); border: 1px solid var(--line); border-radius: var(--radius);
+      backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%);
+      box-shadow: 0 1px 0 rgba(255,255,255,.05) inset, 0 18px 40px -22px rgba(0,0,0,.7);
+    }
+    @media (prefers-reduced-transparency: reduce) { .glass { background: var(--raised); backdrop-filter: none; -webkit-backdrop-filter: none; } }
+    .skip { position: absolute; left: -999px; top: 8px; background: var(--primary); color: var(--primary-fg); padding: 8px 14px; border-radius: 8px; z-index: 10; }
+    .skip:focus { left: 12px; }
+
+    /* Nav */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; text-decoration: none; letter-spacing: -.01em; }
+    .logo { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; color: var(--primary-fg);
+      background: linear-gradient(135deg, var(--primary), var(--accent)); box-shadow: 0 8px 24px -10px rgba(77,141,255,.8); }
+    .links { display: flex; gap: 6px; }
+    .links a { text-decoration: none; color: var(--muted); padding: 8px 14px; border-radius: 10px; font-size: 15px; transition: background-color .15s, color .15s; }
+    .links a:hover { background: rgba(160,185,255,.1); color: var(--fg); }
+
+    /* Hero */
+    .hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; padding: 56px 0 72px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--accent);
+      background: rgba(34,211,238,.1); border: 1px solid rgba(34,211,238,.28); padding: 5px 12px; border-radius: 999px; }
+    h1 { font-size: clamp(36px, 5.4vw, 60px); line-height: 1.06; letter-spacing: -.03em; margin: 18px 0 16px; }
+    h1 span { background: linear-gradient(90deg, var(--primary), var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .lead { font-size: 19px; color: var(--muted); max-width: 54ch; margin: 0; }
+    .meta { display: flex; flex-wrap: wrap; gap: 28px; margin: 26px 0 8px; }
+    .meta dt { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--subtle); }
+    .meta dd { margin: 2px 0 0; font-weight: 600; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+    .btn { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; font-size: 16px; padding: 14px 22px;
+      border-radius: 12px; border: 1px solid var(--line-strong); color: var(--fg); background: var(--glass);
+      transition: transform .15s, filter .15s, background-color .15s; cursor: pointer; }
+    .btn:hover { transform: translateY(-2px); background: var(--glass-strong); }
+    .btn.primary { background: var(--primary); color: var(--primary-fg); border-color: transparent; box-shadow: 0 0 0 1px rgba(77,141,255,.4), 0 14px 34px -12px rgba(77,141,255,.75); }
+    .btn.primary:hover { filter: brightness(1.08); background: var(--primary); }
+    .btn small { display: block; font-weight: 500; font-size: 12px; opacity: .8; }
+    .note { margin: 16px 0 0; font-size: 14px; color: var(--subtle); max-width: 56ch; }
+
+    /* Illustration */
+    .preview { padding: 26px; }
+    .preview .bar { display: flex; gap: 6px; margin-bottom: 18px; }
+    .preview .bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line-strong); }
+    .ring { position: relative; width: 190px; height: 190px; margin: 0 auto; }
+    .ring svg { transform: rotate(-90deg); }
+    .ring .num { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+    .ring .num b { font-size: 52px; line-height: 1; font-variant-numeric: tabular-nums; }
+    .ring .num span { font-size: 13px; color: var(--primary); font-weight: 600; margin-top: 4px; }
+    .rows { margin: 22px 0 0; display: grid; gap: 12px; }
+    .row { display: grid; grid-template-columns: 78px 1fr 40px; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); }
+    .row .track { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
+    .row .track i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--primary), var(--accent)); }
+    .row em { font-style: normal; text-align: right; color: var(--fg); font-variant-numeric: tabular-nums; }
+    .caption { margin: 18px 0 0; text-align: center; font-size: 12px; color: var(--subtle); }
+
+    /* Sections */
+    section { padding: 40px 0; }
+    h2 { font-size: clamp(26px, 3.4vw, 36px); letter-spacing: -.02em; margin: 0 0 10px; }
+    .sub { color: var(--muted); margin: 0 0 28px; max-width: 60ch; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card { padding: 24px; transition: transform .2s, border-color .2s; }
+    .card:hover { transform: translateY(-3px); border-color: var(--line-strong); }
+    .card .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; margin-bottom: 14px;
+      background: rgba(77,141,255,.14); color: var(--primary); }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { margin: 0; color: var(--muted); font-size: 15px; }
+
+    .steps { list-style: none; counter-reset: s; margin: 0; padding: 0; display: grid; gap: 14px; }
+    .steps li { counter-increment: s; display: grid; grid-template-columns: 44px 1fr; gap: 16px; align-items: start; padding: 20px 22px; }
+    .steps li::before { content: counter(s); width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-weight: 700;
+      font-size: 18px; color: var(--primary-fg); background: linear-gradient(135deg, var(--primary), var(--accent)); }
+    .steps b { display: block; margin-bottom: 2px; }
+    .steps span { color: var(--muted); font-size: 15px; }
+
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .panel { padding: 24px; }
+    .panel h3 { margin: 0 0 12px; font-size: 18px; }
+    .panel ul { margin: 0; padding-left: 20px; color: var(--muted); }
+    .panel li { margin: 6px 0; }
+    .hash { display: grid; gap: 14px; }
+    .hash div { font-size: 13px; }
+    .hash b { display: block; font-size: 14px; margin-bottom: 4px; }
+    .hash code { display: block; word-break: break-all; font: 12px/1.5 ui-monospace, "Cascadia Mono", Consolas, monospace; color: var(--muted);
+      background: rgba(0,0,0,.25); border: 1px solid var(--line); padding: 8px 10px; border-radius: 10px; user-select: all; }
+    .copy { margin-top: 6px; background: none; border: 1px solid var(--line-strong); color: var(--muted); border-radius: 8px; padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+    .copy:hover { color: var(--fg); background: rgba(160,185,255,.1); }
+
+    details { padding: 18px 22px; }
+    details + details { margin-top: 12px; }
+    summary { cursor: pointer; font-weight: 600; list-style-position: inside; }
+    details p { margin: 10px 0 0; color: var(--muted); font-size: 15px; }
+    .rel h3 { margin: 0 0 4px; }
+    .rel .date { color: var(--subtle); font-size: 13px; margin-bottom: 10px; display: block; }
+
+    footer { margin-top: 36px; padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--subtle); font-size: 14px;
+      display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding-top: 28px; gap: 36px; }
+      .grid { grid-template-columns: 1fr; } .two { grid-template-columns: 1fr; }
+      .links a:not(.keep) { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="wrap">
+    <nav aria-label="Main">
+      <a class="brand" href="#top">
+        <span class="logo" aria-hidden="true">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><circle cx="12" cy="19" r="2"/></svg>
+        </span>
+        PC Doctor
+      </a>
+      <div class="links">
+        <a href="#features">Features</a>
+        <a href="#release-notes">Release Notes</a>
+        <a class="keep" href="#install">Install</a>
+      </div>
+    </nav>
+
+    <main id="main">
+      <header class="hero" id="top">
+        <div>
+          <span class="eyebrow">Windows x64 desktop app</span>
+          <h1>Keep your PC healthy. <span>Safely.</span></h1>
+          <p class="lead">PC Doctor checks your computer's health, shows exactly what you can clean, and manages startup apps. It asks before it changes anything, and everything stays on your PC.</p>
+          <dl class="meta">
+            <div><dt>Latest release</dt><dd id="v">v1.0.0</dd></div>
+            <div><dt>Status</dt><dd>Unsigned test build</dd></div>
+            <div><dt>Works on</dt><dd>Windows 10 and 11, 64-bit</dd></div>
+          </dl>
+          <div class="actions">
+            <a class="btn primary" id="dl-setup" href="downloads/PC-Doctor-Setup-1.0.0.exe" download>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/></svg>
+              <span>Download Installer<small id="size-setup">EXE · 118 MB</small></span>
+            </a>
+            <a class="btn" id="dl-portable" href="downloads/PC-Doctor-Portable-1.0.0.exe" download>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/></svg>
+              <span>Download Portable<small id="size-portable">EXE · 108 MB</small></span>
+            </a>
+          </div>
+          <p class="note">Recommended: the Installer for most people. Choose Portable to try PC Doctor without installing anything, for example from a USB drive.</p>
+        </div>
+
+        <aside class="glass preview" aria-label="Illustration of the PC Doctor health score">
+          <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="ring" role="img" aria-label="Illustration: a health score of 84 out of 100">
+            <svg width="190" height="190" viewBox="0 0 190 190" aria-hidden="true">
+              <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4d8dff"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+              <circle cx="95" cy="95" r="82" fill="none" stroke="rgba(160,185,255,.2)" stroke-width="13"/>
+              <circle cx="95" cy="95" r="82" fill="none" stroke="url(#g)" stroke-width="13" stroke-linecap="round" stroke-dasharray="515" stroke-dashoffset="82"/>
+            </svg>
+            <div class="num"><b>84</b><span>Good</span></div>
+          </div>
+          <div class="rows" aria-hidden="true">
+            <div class="row">Memory <div class="track"><i style="width:72%"></i></div><em>20/25</em></div>
+            <div class="row">Storage <div class="track"><i style="width:100%"></i></div><em>25/25</em></div>
+            <div class="row">CPU <div class="track"><i style="width:66%"></i></div><em>10/15</em></div>
+            <div class="row">Startup <div class="track"><i style="width:100%"></i></div><em>10/10</em></div>
+          </div>
+          <p class="caption">Illustration of the app. Your own scan shows your PC's real results.</p>
+        </aside>
+      </header>
+
+      <section id="features" aria-labelledby="f-h">
+        <h2 id="f-h">What you get</h2>
+        <p class="sub">Clear results, honest recommendations and no surprises.</p>
+        <div class="grid">
+          <article class="glass card">
+            <div class="ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div>
+            <h3>Health Scan</h3>
+            <p>A 0 to 100 score built from memory, storage, CPU, startup load and junk files, with the reason behind every number.</p>
+          </article>
+          <article class="glass card">
+            <div class="ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg></div>
+            <h3>Smart Cleanup</h3>
+            <p>See every temporary file and cache with its size, choose what to remove, and confirm. Your documents, downloads and projects are never touched.</p>
+          </article>
+          <article class="glass card">
+            <div class="ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15l-3-3a22 22 0 0 1 2-4 13 13 0 0 1 11-5c0 3-1 8-5 11a22 22 0 0 1-4 2zM9 12H4s.5-3 2-4c1.6-1.1 5 0 5 0M12 15v5s3-.5 4-2c1.1-1.6 0-5 0-5"/></svg></div>
+            <h3>Startup Manager</h3>
+            <p>Choose which apps start with Windows. Turning one off keeps it installed, and your original setup can be restored.</p>
+          </article>
+          <article class="glass card">
+            <div class="ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+            <h3>Private by design</h3>
+            <p>No account, no telemetry and no internet connection needed. Your scans and history stay on your PC.</p>
+          </article>
+          <article class="glass card">
+            <div class="ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 15l4-4 3 3 5-6"/></svg></div>
+            <h3>Reports and history</h3>
+            <p>Track your score, free space and recovered storage over time, and export a report as HTML or PDF.</p>
+          </article>
+          <article class="glass card">
+            <div class="ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l4 10h12l4-10-5 4-5-8-5 8z"/></svg></div>
+            <h3>Free and Pro</h3>
+            <p>The Free edition covers everyday checks and cleanup. A Pro license key adds the advanced tools. Keys are checked offline.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="install" aria-labelledby="i-h">
+        <h2 id="i-h">Install in 3 steps</h2>
+        <p class="sub">It takes about a minute. You do not need administrator rights.</p>
+        <ol class="steps">
+          <li class="glass"><div><b>Download the Installer or the Portable file</b><span>Use the buttons at the top of this page. The Installer adds a Start menu entry. The Portable file runs on its own.</span></div></li>
+          <li class="glass"><div><b>Run it, and allow Windows to continue</b><span>This build is not code-signed yet, so Windows may show "Windows protected your PC". Choose <b style="display:inline">More info</b>, then <b style="display:inline">Run anyway</b>. Only do this for a file you downloaded from this page.</span></div></li>
+          <li class="glass"><div><b>Open PC Doctor and run a Quick Scan</b><span>You get your health score in about 15 seconds. Nothing on your PC is changed until you review and approve it.</span></div></li>
+        </ol>
+      </section>
+
+      <section aria-labelledby="r-h">
+        <h2 id="r-h">Before you download</h2>
+        <div class="two">
+          <div class="glass panel">
+            <h3>System requirements</h3>
+            <ul>
+              <li>Windows 10 or Windows 11, 64-bit</li>
+              <li>About 400 MB of free disk space</li>
+              <li>No internet connection needed to run</li>
+              <li>No Node.js or other software needed</li>
+            </ul>
+          </div>
+          <div class="glass panel">
+            <h3>Verify your download</h3>
+            <div class="hash">
+              <div><b>Installer (SHA-256)</b><code id="h-setup">52e3364757a9b808c9aef699fbfbbfca1c93b278f5aa5b6793cf2b49c3171bcd</code><button class="copy" data-copy="h-setup" type="button">Copy</button></div>
+              <div><b>Portable (SHA-256)</b><code id="h-portable">8ea8435d681a54aac60fa0ba01f8d7c729aed885af0fd624929989d84a156feb</code><button class="copy" data-copy="h-portable" type="button">Copy</button></div>
+            </div>
+            <p class="note" style="margin-top:12px">In PowerShell run <code style="display:inline;padding:1px 6px;user-select:text">Get-FileHash .\PC-Doctor-Setup-1.0.0.exe</code> and compare the result.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="release-notes" aria-labelledby="rn-h">
+        <h2 id="rn-h">Release notes</h2>
+        <div class="glass panel rel">
+          <h3>Version 1.0.0</h3>
+          <span class="date">First public test build</span>
+          <ul>
+            <li>Health Scan with an explained 0 to 100 score</li>
+            <li>Smart Cleanup with preview and explicit confirmation</li>
+            <li>Startup Manager with restore of your original setup</li>
+            <li>History, charts and HTML or PDF reports</li>
+            <li>Dark and light themes, with full keyboard support</li>
+            <li>Offline Pro license keys</li>
+          </ul>
+          <p class="note">Not included yet: uninstalling apps from inside PC Doctor, scheduled maintenance, automatic updates, macOS and a code-signed installer.</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="q-h">
+        <h2 id="q-h">Questions</h2>
+        <details class="glass"><summary>Is PC Doctor safe to use?</summary><p>It never deletes anything without showing you a preview and asking you to confirm. It will not touch Documents, Desktop, Downloads, Pictures, Videos, Music, OneDrive or project folders.</p></details>
+        <details class="glass"><summary>Why does Windows warn me?</summary><p>The file is not signed with a paid code-signing certificate yet, so Windows cannot recognise the publisher. Check the SHA-256 value above to be sure your file is exactly the one published here.</p></details>
+        <details class="glass"><summary>Does it send my data anywhere?</summary><p>No. PC Doctor has no account, no telemetry and blocks itself from contacting the internet. Scan history is stored on your PC only.</p></details>
+        <details class="glass"><summary>How do I remove it?</summary><p>If you used the Installer, uninstall it from Windows Settings, Apps. If you used the Portable file, delete it. To remove saved history too, delete the folder %APPDATA%\pc-doctor-desktop.</p></details>
+      </section>
+    </main>
+
+    <footer>
+      <span>Copyright <span id="year">2026</span> PC Doctor &middot; Developer: Ranjith Kumar</span>
+      <span>Build <span id="build">v1.0.0</span></span>
+    </footer>
+  </div>
+
+  <script>
+    // ---- Release settings: edit this block when you publish a new build. ----
+    // Use relative paths (the files sit next to this page) or full https:// links,
+    // for example GitHub Releases links when the host limits file size.
+    var RELEASE = {
+      version: '1.0.0',
+      setup:    { url: 'downloads/PC-Doctor-Setup-1.0.0.exe',    size: '118 MB', sha256: '52e3364757a9b808c9aef699fbfbbfca1c93b278f5aa5b6793cf2b49c3171bcd' },
+      portable: { url: 'downloads/PC-Doctor-Portable-1.0.0.exe', size: '108 MB', sha256: '8ea8435d681a54aac60fa0ba01f8d7c729aed885af0fd624929989d84a156feb' }
+    };
+
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      $('dl-setup').href = RELEASE.setup.url;
+      $('dl-portable').href = RELEASE.portable.url;
+      $('size-setup').textContent = 'EXE · ' + RELEASE.setup.size;
+      $('size-portable').textContent = 'EXE · ' + RELEASE.portable.size;
+      $('h-setup').textContent = RELEASE.setup.sha256;
+      $('h-portable').textContent = RELEASE.portable.sha256;
+      $('v').textContent = $('build').textContent = 'v' + RELEASE.version;
+      $('year').textContent = new Date().getFullYear();
+
+      document.querySelectorAll('.copy').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var text = $(btn.getAttribute('data-copy')).textContent;
+          var done = function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1600); };
+          if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () {});
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

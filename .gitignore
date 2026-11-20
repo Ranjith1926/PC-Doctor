@@ -1,0 +1,20 @@
+# Dependencies and build output
+node_modules/
+out/
+dist/
+Output file/
+
+# Large installers copied next to the download page
+apps/desktop/website/downloads/
+
+# Never commit signing keys or license keys
+*.pem
+*.key
+LICENSE-KEY.txt
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.claude/
+graphify-out/

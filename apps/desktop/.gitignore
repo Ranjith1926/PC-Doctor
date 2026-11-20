@@ -1,0 +1,12 @@
+node_modules/
+out/
+dist/
+# Never commit signing keys. The real one lives outside the project, this is a safety net.
+*.pem
+*.key
+
+# Packaged installers (built with npm run dist)
+Output file/
+
+# Large installers copied next to the download page
+website/downloads/

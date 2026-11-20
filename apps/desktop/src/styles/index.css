@@ -1,0 +1,292 @@
+@import 'tailwindcss';
+@import '@fontsource/fira-sans/400.css';
+@import '@fontsource/fira-sans/500.css';
+@import '@fontsource/fira-sans/600.css';
+@import '@fontsource/fira-sans/700.css';
+@import '@fontsource/fira-code/400.css';
+@import '@fontsource/fira-code/500.css';
+@import '@fontsource/fira-code/600.css';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ------------------------------------------------------------------------
+   PC Doctor design tokens
+   Informed by UI UX Pro Max: Liquid Glass / Glassmorphism style, "Dashboard Data"
+   type pairing (Fira Sans + Fira Code), semantic tokens, 4.5:1 text contrast,
+   visible focus, reduced-motion and reduced-transparency support.
+   ------------------------------------------------------------------------ */
+:root,
+:root[data-theme='dark'] {
+  --bg: #080d1c;
+  --bg-raised: #0e1630;
+  --glass: rgba(21, 31, 60, 0.58);
+  --glass-strong: rgba(26, 38, 72, 0.82);
+  --glass-hover: rgba(34, 48, 90, 0.66);
+  --line: rgba(160, 185, 255, 0.15);
+  --line-strong: rgba(160, 185, 255, 0.28);
+  --fg: #eaf0ff;
+  --fg-muted: #a3b3d6;
+  --fg-subtle: #8393b9;
+  --primary: #4d8dff;
+  --primary-fg: #06112b;
+  --accent: #22d3ee;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --ring: #8bb8ff;
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 24px -12px rgba(0, 0, 0, 0.55);
+  --shadow-2: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 18px 40px -16px rgba(0, 0, 0, 0.7);
+  --glow: 0 0 0 1px rgba(77, 141, 255, 0.35), 0 8px 28px -10px rgba(77, 141, 255, 0.55);
+  --ambient-1: rgba(77, 141, 255, 0.22);
+  --ambient-2: rgba(34, 211, 238, 0.13);
+  --ambient-3: rgba(124, 58, 237, 0.13);
+  --blur: 18px;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #eef2fa;
+  --bg-raised: #ffffff;
+  --glass: rgba(255, 255, 255, 0.66);
+  --glass-strong: rgba(255, 255, 255, 0.88);
+  --glass-hover: rgba(255, 255, 255, 0.82);
+  --line: rgba(30, 50, 110, 0.12);
+  --line-strong: rgba(30, 50, 110, 0.24);
+  --fg: #0f1830;
+  --fg-muted: #46557a;
+  --fg-subtle: #5a698e;
+  --primary: #2358d8;
+  --primary-fg: #ffffff;
+  --accent: #7c3aed;
+  --success: #0b7a52;
+  --warning: #9a5700;
+  --danger: #c62828;
+  --ring: #2358d8;
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 8px 24px -14px rgba(25, 45, 110, 0.28);
+  --shadow-2: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 18px 40px -18px rgba(25, 45, 110, 0.38);
+  --glow: 0 0 0 1px rgba(35, 88, 216, 0.3), 0 8px 24px -10px rgba(35, 88, 216, 0.4);
+  --ambient-1: rgba(35, 88, 216, 0.14);
+  --ambient-2: rgba(124, 58, 237, 0.1);
+  --ambient-3: rgba(34, 211, 238, 0.1);
+  color-scheme: light;
+}
+
+@theme inline {
+  --font-sans: 'Fira Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --color-bg: var(--bg);
+  --color-raised: var(--bg-raised);
+  --color-surface: var(--glass);
+  --color-surface-strong: var(--glass-strong);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--fg-muted);
+  --color-subtle: var(--fg-subtle);
+  --color-primary: var(--primary);
+  --color-primary-fg: var(--primary-fg);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --radius-card: 16px;
+  --radius-control: 10px;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  /* Soft ambient lighting behind the glass layers. */
+  background-image:
+    radial-gradient(900px 600px at 12% -8%, var(--ambient-1), transparent 60%),
+    radial-gradient(700px 520px at 100% 6%, var(--ambient-2), transparent 60%),
+    radial-gradient(820px 560px at 55% 118%, var(--ambient-3), transparent 60%);
+  background-attachment: fixed;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ---- Glass surfaces ---------------------------------------------------- */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(var(--blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(140%);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-1);
+}
+.glass-strong {
+  background: var(--glass-strong);
+  backdrop-filter: blur(calc(var(--blur) + 6px)) saturate(150%);
+  -webkit-backdrop-filter: blur(calc(var(--blur) + 6px)) saturate(150%);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-2);
+}
+.glass-interactive {
+  transition:
+    transform 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out),
+    background-color 200ms var(--ease-out);
+}
+.glass-interactive:hover {
+  transform: translateY(-2px);
+  background: var(--glass-hover);
+  box-shadow: var(--shadow-2);
+}
+
+/* Text on glass must stay readable: users who ask for less transparency get solid surfaces. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-strong {
+    background: var(--bg-raised);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .glass,
+  .glass-strong {
+    background: var(--bg-raised);
+  }
+}
+
+/* ---- Accessibility ----------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- Window chrome ----------------------------------------------------- */
+.drag {
+  -webkit-app-region: drag;
+}
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* ---- Details ----------------------------------------------------------- */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.selectable {
+  user-select: text;
+}
+::selection {
+  background: color-mix(in srgb, var(--primary) 40%, transparent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+input[type='checkbox'].check {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--line-strong);
+  background: transparent;
+  display: inline-grid;
+  place-content: center;
+  cursor: pointer;
+  transition:
+    background-color 120ms,
+    border-color 120ms;
+  flex: none;
+}
+input[type='checkbox'].check:checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+input[type='checkbox'].check:checked::after {
+  content: '';
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid var(--primary-fg);
+  border-bottom: 2px solid var(--primary-fg);
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+input[type='checkbox'].check:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--line) 0%, var(--line-strong) 50%, var(--line) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: 8px;
+}
+
+/* ---- Overlay animations ------------------------------------------------ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes dialogIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes menuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
